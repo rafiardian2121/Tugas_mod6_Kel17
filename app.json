@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -23,17 +23,21 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.rafiardian.iotwatchslug"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "backendUrl": "http://192.168.18.11:5000",
+      "backendUrl": "http://10.0.2.2:5000",
       "mqtt": {
         "brokerUrl": "wss://broker.hivemq.com:8884/mqtt",
-        "topic": "ppb/kelXX/iot/temperature"
+        "topic": "ppb/kel17/iot/temperature"
       }
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

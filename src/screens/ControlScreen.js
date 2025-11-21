@@ -10,12 +10,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Api } from "../services/api.js";
 import { DataTable } from "../components/DataTable.js";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTabSwipe } from "../hooks/useTabSwipe.js";
+import { PanGestureHandler } from "react-native-gesture-handler";
 
-export function ControlScreen() {
+function ControlScreen() {
   const [thresholdValue, setThresholdValue] = useState(30);
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -65,76 +67,78 @@ export function ControlScreen() {
   }, [thresholdValue, note, fetchHistory]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Configure Threshold</Text>
-          {latestThreshold !== null && (
-            <Text style={styles.metaText}>
-              Current threshold: {Number(latestThreshold).toFixed(2)}°C
-            </Text>
-          )}
-          <Text style={styles.label}>Threshold (°C)</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            value={String(thresholdValue)}
-            onChangeText={setThresholdValue}
-          />
-          <Text style={styles.label}>Note (optional)</Text>
-          <TextInput
-            style={[styles.input, styles.noteInput]}
-            value={note}
-            onChangeText={setNote}
-            multiline
-            numberOfLines={3}
-            placeholder="Describe why you are changing the threshold"
-          />
-          {error && <Text style={styles.errorText}>{error}</Text>}
-          <TouchableOpacity
-            style={[styles.button, submitting && styles.buttonDisabled]}
-            onPress={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Save Threshold</Text>}
-          </TouchableOpacity>
-        </View>
+      // <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.card}>
+              <Text style={styles.title}>Configure Threshold</Text>
+              {latestThreshold !== null && (
+                <Text style={styles.metaText}>
+                  Current threshold: {Number(latestThreshold).toFixed(2)}°C
+                </Text>
+              )}
+              <Text style={styles.label}>Threshold (°C)</Text>
+              <TextInput
+                style={styles.input}
+                keyboardType="numeric"
+                value={String(thresholdValue)}
+                onChangeText={setThresholdValue}
+              />
+              <Text style={styles.label}>Note (optional)</Text>
+              <TextInput
+                style={[styles.input, styles.noteInput]}
+                value={note}
+                onChangeText={setNote}
+                multiline
+                numberOfLines={3}
+                placeholder="Describe why you are changing the threshold"
+              />
+              {error && <Text style={styles.errorText}>{error}</Text>}
+              <TouchableOpacity
+                style={[styles.button, submitting && styles.buttonDisabled]}
+                onPress={handleSubmit}
+                disabled={submitting}
+              >
+                {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Save Threshold</Text>}
+              </TouchableOpacity>
+            </View>
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Threshold History</Text>
-          {loading && <ActivityIndicator />}
-        </View>
-        <DataTable
-          columns={[
-            {
-              key: "created_at",
-              title: "Saved At",
-              render: (value) => (value ? new Date(value).toLocaleString() : "--"),
-            },
-            {
-              key: "value",
-              title: "Threshold (°C)",
-              render: (value) =>
-                typeof value === "number" ? `${Number(value).toFixed(2)}` : "--",
-            },
-            {
-              key: "note",
-              title: "Note",
-              render: (value) => value || "-",
-            },
-          ]}
-          data={history}
-          keyExtractor={(item) => item.id}
-        />
-      </ScrollView>
-    </KeyboardAvoidingView>
-    </SafeAreaView>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Threshold History</Text>
+              {loading && <ActivityIndicator />}
+            </View>
+            <DataTable
+              columns={[
+                {
+                  key: "created_at",
+                  title: "Saved At",
+                  render: (value) => (value ? new Date(value).toLocaleString() : "--"),
+                },
+                {
+                  key: "value",
+                  title: "Threshold (°C)",
+                  render: (value) =>
+                    typeof value === "number" ? `${Number(value).toFixed(2)}` : "--",
+                },
+                {
+                  key: "note",
+                  title: "Note",
+                  render: (value) => value || "-",
+                },
+              ]}
+              data={history}
+              keyExtractor={(item) => item.id}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
+      // </SafeAreaView>
   );
 }
+
+export default useTabSwipe(ControlScreen);
 
 const styles = StyleSheet.create({
   container: {
